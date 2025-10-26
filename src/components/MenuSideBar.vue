@@ -48,8 +48,8 @@ function goTo(route: string) {
 .menu-sidebar {
   width: 200px;
   background: #2d2d2d;
-  color: #fff;
-  height: 100vh;
+  color: #9ca3af;;
+  min-height: 100vh;
   padding: 1rem;
 }
 

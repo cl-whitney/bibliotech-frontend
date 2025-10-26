@@ -1,15 +1,22 @@
-import { createRouter, createWebHistory } from 'vue-router';
-import SnippetsList from '../components/SnippetsList.vue';
+import { createRouter, createWebHistory } from 'vue-router'
+import MainLayout from '../layouts/MainLayout.vue'     
+import SnippetsList from '../pages/SnippetsList.vue'
 
 const routes = [
-  { path: '/', component: SnippetsList },
-  { path: '/snippets', component: SnippetsList },
-  { path: '/tags', component: SnippetsList }, // placeholder
-  { path: '/account', component: SnippetsList }, // placeholder
-  { path: '/favorites', component: SnippetsList }, // placeholder
-];
+  {
+    path: '/',
+    component: MainLayout,
+    children: [
+      { path: '', component: SnippetsList },            
+      { path: 'snippets', component: SnippetsList },
+      { path: 'tags', component: SnippetsList },
+      { path: 'account', component: SnippetsList },
+      { path: 'favorites', component: SnippetsList }
+    ]
+  }
+]
 
 export const router = createRouter({
   history: createWebHistory(),
   routes,
-});
+})

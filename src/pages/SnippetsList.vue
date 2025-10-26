@@ -1,11 +1,9 @@
 <template>
   <section>
-    <h2>Liste des Snippets</h2>
-
     <div v-if="loading">Chargement...</div>
     <div v-else-if="error">{{ error }}</div>
-    
-    <ul v-else>
+
+    <ul class="snippet-list" v-else>
       <SnippetCard
         v-for="snippet in snippets"
         :key="snippet.id"
@@ -17,7 +15,7 @@
 
 <script setup lang="ts">
 import { ref, onMounted } from "vue";
-import SnippetCard from "./SnippetCard.vue";
+import SnippetCard from "../components/SnippetCard.vue";
 import type { Snippet } from "../types";
 
 const snippets = ref<Snippet[]>([]);
@@ -47,8 +45,11 @@ onMounted(fetchSnippets);
 </script>
 
 <style scoped>
-ul {
+.snippet-list {
   list-style: none;
   padding: 0;
-}
+  margin-top: 0;
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 1rem;}
 </style>
