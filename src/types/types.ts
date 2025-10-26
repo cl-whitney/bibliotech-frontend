@@ -1,3 +1,22 @@
+export interface SignupInput {
+  first_name: string;
+  last_name: string;
+  email: string;
+  password: string;
+  role?: string; 
+}
+
+export interface LoginInput {
+  email: string;
+  password: string;
+}
+
+export interface AuthResponse {
+  token: string; 
+  userId: number;
+  role: string;
+}
+
 export type Role = "invalide" | "admin" | "member";
 
 export interface User {
@@ -49,5 +68,4 @@ export interface SnippetHasTag {
 	updated_at?: Date;
 }
 
-// Session-safe user type (we should never store password in session)
 export type SessionUser = Omit<User, "password">;
