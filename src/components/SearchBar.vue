@@ -117,6 +117,7 @@ function highlight(text = '') {
   background: #bdbcbc1e; /* couleur de fond légère */
   border-radius: 9999px; /* pill shape */
   padding: 0.5rem 1rem;
+  margin: auto 2.5rem;
 }
 
 .icon {
@@ -147,6 +148,10 @@ function highlight(text = '') {
   max-height: 240px;
   overflow: auto;
   background: #fff;
+  padding: 0.5rem 1rem;
+  margin: auto 2.5rem;
+  margin-top: 0.5rem;
+    margin-top: 0.5rem;
 }
 
 .result-item {

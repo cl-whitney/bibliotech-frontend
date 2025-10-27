@@ -1,92 +1,129 @@
 <template>
-  <div class="snippet-card-container">
-  <li class="snippet-card">
-    <div class="snippet-title">
-      <pre>Titre: {{ snippet.title }}</pre>
+  <li class="snippet-card" @click="goToDetail">
+  <div class="snippet-title">{{ props.snippet.title }}</div>
+
+  <div class="snippet-meta">
+    <div>
+      <span class="meta-label">Language: </span>
+      <span class="meta-value">{{ props.snippet.language?.name ?? '-' }}</span>
     </div>
-    <div class="snippet-header">
-      <pre>Language: {{ snippet.language?.name ?? '-' }}</pre>
-      <pre>Tags: <span v-if="snippet.tags && snippet.tags.length"><span v-for="tag in snippet.tags" :key="tag.id">{{ tag.name }} </span></span><span v-else>-</span></pre>
-      <pre>Description: {{ snippet.description ?? '-' }}</pre>
-    </div>
-    <div class="snippet-code">
-      <pre id="snippet-code">Code: {{ snippet.code }}</pre>
-    </div>
-    <div class="snippet-footer">
-      <pre>Créé le: {{ new Date(snippet.created_at).toLocaleString() }}</pre>
-      <pre>Mis à jour le: {{ snippet.updated_at ? new Date(snippet.updated_at).toLocaleString() : '-' }}</pre>
-    </div>
-  </li>
+
+    <span class="meta-value tags">
+      <span v-if="props.snippet.tags && props.snippet.tags.length">
+        <span v-for="tag in props.snippet.tags" :key="tag.id" class="tag">{{ tag.name }}</span>
+      </span>
+      <span v-else>-</span>
+    </span>
   </div>
+
+  <div class="snippet-description">
+    <span class="meta-label">Description: </span>
+    <span class="meta-value">{{ props.snippet.description ?? '-' }}</span>
+  </div>
+
+  <div class="snippet-code">
+    <pre>{{ props.snippet.code }}</pre>
+  </div>
+
+  <div class="snippet-footer">
+    <span>Créé: {{ new Date(props.snippet.created_at).toLocaleString() }}</span>
+    <span> | Mis à jour: {{ props.snippet.updated_at ? new Date(props.snippet.updated_at).toLocaleString() : '-' }}</span>
+  </div>
+</li>
+
 </template>
 
 <script setup lang="ts">
-import type { Snippet } from "../types";
+import { useRouter } from 'vue-router';
+import type { Snippet } from "../types/types";
 
-defineProps<{ snippet: Snippet }>();
+// Récupère la prop
+const props = defineProps<{ snippet: Snippet }>();
+
+const router = useRouter();
+
+function goToDetail() {
+  router.push({ name: "SnippetDetail", params: { id: props.snippet.id } });
+}
+
 </script>
 
+
 <style scoped>
-.snippet-card-container {
-  width: 100%;
-  display: block;
-}
-
 .snippet-card {
-  background: #18534f;
-  margin-bottom: 1rem;
-  padding: 1rem;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-}
-.snippet-title {
   width: 100%;
-
-  margin-bottom: 0.5rem;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  background: #1c3632;
+  color: #f5f5f5;
+  padding: 1rem 1.2rem;
+  margin-bottom: 1rem;
+  border-radius: 10px;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+  transition: transform 0.2s, box-shadow 0.2s;
+  cursor: pointer;
 }
 
-.snippet-title pre {
-  /* background: linear-gradient(90deg, #0b7a72, #18534f); */
-  background: none;
-  color: #fff;
-  font-weight: 700;
-  font-size: 1.1rem;
-  padding: 0.6rem;
-  margin: 0;
+.snippet-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 6px 15px rgba(0,0,0,0.3);
+}
 
+.snippet-title {
+  font-size: 1.3rem;
+  font-weight: 700;
+  margin-bottom: 0.5rem;
+  color: #24d650;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
 }
-.snippet-header, .snippet-footer {
-  width: 100%;
-  margin-bottom: 0.5rem;
-  /* background: #6aa84fa1; */
-  border-radius: 8px;
-  margin-bottom: 0.5rem;
 
+.snippet-meta {
+  display: flex;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 0.5rem 1rem;
+  margin-bottom: 0.5rem;
 }
+
+.meta-label {
+  font-weight: 600;
+  color: #a7e4b2;
+}
+
+.meta-value {
+  font-weight: 400;
+}
+
+.tags .tag {
+  background-color: #24d650;
+  color: #fff;
+  border-radius: 6px;
+  padding: 0.2rem 0.5rem;
+  margin-right: 0.3rem;
+  font-size: 0.85rem;
+}
+
+.snippet-description {
+  margin-bottom: 0.5rem;
+}
+
 .snippet-code {
-  background: #141a19ff;
+  background: #0e403e;
   padding: 1rem;
   border-radius: 8px;
-  margin-bottom: 0.5rem;
-}
-
-#snippet-code {
-  background: none;
-}
-
-.snippet-code pre {
-  background: #0e403e;
-}
-
-pre {
-  color: #fff;
-  background: #6aa84fa1;
-  padding: 0.5rem;
-  border-radius: 4px;
   overflow-x: auto;
-  margin: 0 0 0.5rem 0;
+  margin-bottom: 0.5rem;
+  font-family: 'Fira Code', monospace;
+  font-size: 0.95rem;
 }
 
+.snippet-footer {
+  font-size: 0.85rem;
+  color: #ccc;
+  display: flex;
+  justify-content: space-between;
+}
 </style>

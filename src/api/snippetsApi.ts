@@ -12,20 +12,15 @@ export async function fetchAllSnippets(): Promise<Snippet[]> {
   }
 }
 
-export async function fetchSnippetById(id: number): Promise<Snippet> {
-  try {
-    const response = await axios.get<Snippet>(`${API_BASE_URL}/${id}`, {
-      withCredentials: true,
-    });
-    return response.data;
-  } catch (error: any) {
-    const message =
-      error.response?.status === 404 ?
-      "Snippet non trouvé" :
-      error.response?.data?.message || error.message || "Erreur lors de la récupération du snippet";
-    throw new Error(message);
-  }
+export async function fetchSnippetById(id: number, token?: string): Promise<Snippet> {
+  if (!token) throw new Error("Accès non autorisé. Token manquant.");
+  const response = await axios.get<Snippet>(`${API_BASE_URL}/${id}`, {
+    headers: { Authorization: `Bearer ${token}` },
+  });
+  return response.data;
 }
+
+
 
 export async function searchSnippets(query: string): Promise<Snippet[]> {
   try {

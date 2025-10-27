@@ -12,5 +12,6 @@
   padding: 2rem;
   background: #1e1f1dff;
   min-height: 80vh;
+  width: 100%;
 }
 </style>

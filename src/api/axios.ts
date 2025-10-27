@@ -1,22 +1,16 @@
 import axios from "axios";
 
-const API_BASE_URL = "http://localhost:3000";
-
-const axiosInstance = axios.create({
-  baseURL: API_BASE_URL,
+const instance = axios.create({
+  baseURL: "http://localhost:3000",
   withCredentials: true, 
-  headers: {
-    "Content-Type": "application/json",
-  },
 });
 
-
-export function setAuthToken(token: string | null): void {
+export function setAuthToken(token: string | null) {
   if (token) {
-    axiosInstance.defaults.headers.common.Authorization = `Bearer ${token}`;
+    instance.defaults.headers.common["Authorization"] = `Bearer ${token}`;
   } else {
-    delete axiosInstance.defaults.headers.common.Authorization;
+    delete instance.defaults.headers.common["Authorization"];
   }
 }
 
-export default axiosInstance;
+export default instance;

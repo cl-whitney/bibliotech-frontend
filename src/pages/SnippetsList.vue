@@ -16,7 +16,7 @@
 <script setup lang="ts">
 import { ref, onMounted } from "vue";
 import SnippetCard from "../components/SnippetCard.vue";
-import type { Snippet } from "../types";
+import type { Snippet } from "../types/types";
 
 const snippets = ref<Snippet[]>([]);
 const loading = ref(true);
@@ -50,6 +50,12 @@ onMounted(fetchSnippets);
   padding: 0;
   margin-top: 0;
   display: grid;
-  grid-template-columns: 1fr 1fr 1fr;
-  gap: 1rem;}
+  grid-template-columns: repeat(3, 1fr); /* exactement 3 colonnes égales */
+  gap: 1rem;
+}
+@media (max-width: 900px) {
+  .snippet-list {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
 </style>

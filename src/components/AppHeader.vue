@@ -1,7 +1,6 @@
 <template>
   <header class="app-header">
     <div class="logo">
-      <!-- Mets ton logo ou un texte -->
       <span>📚 BiblioTech</span>
     </div>
     <SearchBar />
@@ -10,6 +9,7 @@
 
 <script setup>
 import SearchBar from '../components/SearchBar.vue';
+import LogoutBtn from '../components/LogoutBtn.vue';
 </script>
 
 <style scoped>
