@@ -1,58 +1,56 @@
 <script setup lang="ts">
-import { ref, computed } from "vue";
+import { computed, ref } from "vue";
 import { useRoute, useRouter } from "vue-router";
-import { loginUser } from "../api/useAuth";
 import { signup } from "../api/authApi";
+import { loginUser } from "../api/useAuth";
 import type { LoginInput, SignupInput } from "../types/types";
 
 const route = useRoute();
 const router = useRouter();
 
 const mode = computed(() =>
-  route.query.mode === "signup" ? "signup" : "login"
+	route.query.mode === "signup" ? "signup" : "login",
 );
 
 const loginForm = ref<LoginInput>({
-  email: "",
-  password: "",
+	email: "",
+	password: "",
 });
 
 const signupForm = ref<SignupInput>({
-  first_name: "",
-  last_name: "",
-  email: "",
-  password: "",
+	first_name: "",
+	last_name: "",
+	email: "",
+	password: "",
 });
 
 const localError = ref<string | null>(null);
 
 async function handleLogin() {
-  localError.value = null;
-  try {
-    await loginUser(loginForm.value);
-    router.push("/"); 
-  } catch (e: any) {
-    localError.value = e.message || "Erreur lors de la connexion";
-  }
+	localError.value = null;
+	try {
+		await loginUser(loginForm.value);
+		router.push("/");
+	} catch (e: any) {
+		localError.value = e.message || "Erreur lors de la connexion";
+	}
 }
 
 async function handleSignup() {
-  localError.value = null;
-  try {
-    await signup(signupForm.value);
+	localError.value = null;
+	try {
+		await signup(signupForm.value);
 
-    await loginUser({
-      email: signupForm.value.email,
-      password: signupForm.value.password,
-    });
+		await loginUser({
+			email: signupForm.value.email,
+			password: signupForm.value.password,
+		});
 
-    router.push("/");
-  } catch (e: any) {
-    localError.value = e.message || "Erreur lors de l'inscription";
-  }
+		router.push("/");
+	} catch (e: any) {
+		localError.value = e.message || "Erreur lors de l'inscription";
+	}
 }
-
-
 </script>
 
 <template>

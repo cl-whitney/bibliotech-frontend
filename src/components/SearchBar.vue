@@ -18,90 +18,96 @@
     </div>
 
     <ul v-if="debouncedQuery && results.length" class="results" role="listbox">
-  <li
-    v-for="snippet in results"
-    :key="snippet.id ?? snippet.name"
-    class="result-item"
-    @click="select(snippet)"
-    tabindex="0"
-    role="option"
-  >
-    <div class="name" v-html="highlight(snippet.name)"></div>
-    <div class="desc" v-if="snippet.description">{{ snippet.description }}</div>
-  </li>
-</ul>
+      <li
+        v-for="snippet in results"
+        :key="snippet.id"
+        class="result-item"
+        @click="select(snippet)"
+        tabindex="0"
+        role="option"
+      >
+        <div class="name" v-html="highlight(snippet.title)"></div>
+        <div class="desc" v-if="snippet.description">{{ snippet.description }}</div>
+      </li>
+    </ul>
 
     <p v-else-if="debouncedQuery" class="no-results">Aucun résultat</p>
   </div>
 </template>
 
-<script setup>
-import { ref, computed, watch } from 'vue'
+<script setup lang="ts">
+import { ref, watch } from "vue";
+import { useRouter } from "vue-router";
+import { searchSnippets } from "../api/snippetsApi";
+import type { Snippet } from "../types/types";
 
 const props = defineProps({
-  placeholder: { type: String, default: 'Rechercher un snippet...' },
-  debounceMs: { type: Number, default: 200 }
-})
-const emit = defineEmits(['select'])
+	placeholder: {
+		type: String,
+		default: "Rechercher un snippet par titre, tag ou description ...",
+	},
+	debounceMs: { type: Number, default: 200 },
+});
 
-const query = ref('')
-const debouncedQuery = ref('')
-const results = ref([])
+const query = ref("");
+const debouncedQuery = ref("");
+const results = ref<Snippet[]>([]);
+let timer: ReturnType<typeof setTimeout> | null = null;
 
-let timer = null
+const router = useRouter();
+
 function onInput() {
-  clearTimeout(timer)
-  timer = setTimeout(() => {
-    debouncedQuery.value = query.value.trim()
-  }, props.debounceMs)
+	if (timer) clearTimeout(timer);
+	timer = setTimeout(() => {
+		debouncedQuery.value = query.value.trim();
+	}, props.debounceMs);
 }
 
 watch(debouncedQuery, async (q) => {
-  if (!q) {
-    results.value = []
-    return
-  }
-  try {
-    const res = await fetch(`http://localhost:3000/api/snippets/search?q=${encodeURIComponent(q)}`)
-    if (!res.ok) throw new Error('Erreur API')
-    results.value = await res.json()
-  } catch (err) {
-    console.error(err)
-    results.value = []
-  }
-})
+	if (!q) {
+		results.value = [];
+		return;
+	}
+	try {
+		results.value = await searchSnippets(q);
+	} catch (err) {
+		console.error(err);
+		results.value = [];
+	}
+});
 
-function select(snippet) {
-  emit('select', snippet)
-  query.value = snippet.name || ''
-  debouncedQuery.value = snippet.name || ''
+function select(snippet: Snippet) {
+	query.value = snippet.title;
+	debouncedQuery.value = snippet.title;
+	router.push({ name: "SnippetDetail", params: { id: snippet.id } });
 }
 
 function selectFirst() {
-  if (results.value.length) select(results.value[0])
+	const first = results.value[0];
+	if (first) select(first);
 }
 
-function escapeHtml(str = '') {
-  return String(str)
-    .replace(/&/g, '&amp;')
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;')
-    .replace(/"/g, '&quot;')
-    .replace(/'/g, '&#39;')
+// 🔹 utilitaires pour surligner la recherche
+function escapeHtml(str = "") {
+	return String(str)
+		.replace(/&/g, "&amp;")
+		.replace(/</g, "&lt;")
+		.replace(/>/g, "&gt;")
+		.replace(/"/g, "&quot;")
+		.replace(/'/g, "&#39;");
 }
 
-function escapeRegExp(s = '') {
-  return s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
+function escapeRegExp(s = "") {
+	return s.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 }
 
-function highlight(text = '') {
-  const q = debouncedQuery.value
-  if (!q) return escapeHtml(text)
-  const pattern = new RegExp(`(${escapeRegExp(q)})`, 'ig')
-  return escapeHtml(text).replace(pattern, '<mark>$1</mark>')
+function highlight(text = "") {
+	const q = debouncedQuery.value;
+	if (!q) return escapeHtml(text);
+	const pattern = new RegExp(`(${escapeRegExp(q)})`, "ig");
+	return escapeHtml(text).replace(pattern, "<mark>$1</mark>");
 }
 </script>
-
 
 <style scoped>
 .search-snippets {
@@ -114,8 +120,8 @@ function highlight(text = '') {
 .search-wrapper {
   display: flex;
   align-items: center;
-  background: #bdbcbc1e; /* couleur de fond légère */
-  border-radius: 9999px; /* pill shape */
+  background: #bdbcbc1e;
+  border-radius: 9999px;
   padding: 0.5rem 1rem;
   margin: auto 2.5rem;
 }
@@ -123,7 +129,7 @@ function highlight(text = '') {
 .icon {
   width: 1.2rem;
   height: 1.2rem;
-  color: #9ca3af; /* gris doux */
+  color: #9ca3af;
   margin-right: 0.5rem;
 }
 
@@ -131,7 +137,7 @@ function highlight(text = '') {
   flex: 1;
   border: none;
   outline: none;
-  background: transparent; /* plus de bordure ni de fond */
+  background: transparent;
   font-size: 1rem;
 }
 
@@ -151,7 +157,6 @@ function highlight(text = '') {
   padding: 0.5rem 1rem;
   margin: auto 2.5rem;
   margin-top: 0.5rem;
-    margin-top: 0.5rem;
 }
 
 .result-item {
@@ -178,5 +183,7 @@ mark {
 .no-results {
   margin-top: 0.5rem;
   color: #64748b;
+  display: flex;
+  justify-content: center;
 }
 </style>

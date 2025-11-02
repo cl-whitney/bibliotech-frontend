@@ -1,16 +1,16 @@
 <script setup lang="ts">
-import { useRouter } from 'vue-router';
-import { logoutUser } from '../api/useAuth';
+import { useRouter } from "vue-router";
+import { logoutUser } from "../api/useAuth";
 
 const router = useRouter();
 
 async function handleLogout() {
-  try {
-    await logoutUser();
-    router.push('/auth');
-  } catch (err: any) {
-    console.error('Erreur logout:', err.message || err);
-  }
+	try {
+		await logoutUser();
+		router.push("/auth");
+	} catch (err: any) {
+		console.error("Erreur logout:", err.message || err);
+	}
 }
 </script>
 

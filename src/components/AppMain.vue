@@ -11,7 +11,7 @@
 .app-main {
   padding: 2rem;
   background: #1e1f1dff;
-  min-height: 80vh;
+  min-height: 100vh;
   width: 100%;
 }
 </style>

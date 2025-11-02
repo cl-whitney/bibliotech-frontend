@@ -29,10 +29,15 @@
       </div>
 
       <div class="account-actions">
-        <button class="btn" @click="toggleEditMode">
-          {{ editMode ? 'Annuler' : 'Modifier mes infos' }}
+        <button class="btn edit" @click="toggleEditMode">
+          ✏️ {{ editMode ? 'Annuler' : 'Modifier mes infos' }}
         </button>
-        <button class="btn logout" @click="logout">Se déconnecter</button>
+
+        <button class="btn password" @click="togglePasswordMode">
+          🔑 Modifier mon mot de passe
+        </button>
+
+        <button class="btn logout" @click="logout">🚪 Déconnexion</button>
       </div>
 
       <div v-if="editMode" class="account-edit">
@@ -53,160 +58,288 @@
           </label>
 
           <button type="submit" class="btn save-btn" :disabled="updating">
-            {{ updating ? 'Mise à jour...' : 'Enregistrer' }}
+            💾 {{ updating ? 'Mise à jour...' : 'Enregistrer' }}
           </button>
         </form>
+      </div>
+
+      <div v-if="passwordMode" class="password-form">
+        <form @submit.prevent="handlePasswordChange">
+          <label>
+            Ancien mot de passe :
+            <input type="password" v-model="passwordForm.oldPassword" required />
+          </label>
+
+          <label>
+            Nouveau mot de passe :
+            <input type="password" v-model="passwordForm.newPassword" required />
+          </label>
+
+          <button type="submit" class="btn save-btn" :disabled="updating">
+            🔒 {{ updating ? 'Modification...' : 'Changer le mot de passe' }}
+          </button>
+        </form>
+      </div>
+
+      <div class="danger-zone">
+        <h3>Zone dangereuse</h3>
+        <p>Supprimer votre compte est une action <strong>irréversible</strong>.</p>
+        <button class="btn delete" @click="confirmDelete = true">🗑️ Supprimer mon compte</button>
+      </div>
+    </div>
+
+    <!-- Modale de confirmation -->
+    <div v-if="confirmDelete" class="modal-overlay">
+      <div class="modal">
+        <h3>Confirmer la suppression</h3>
+        <p>Êtes-vous sûr de vouloir supprimer votre compte ? Cette action est définitive.</p>
+        <div class="modal-actions">
+          <button class="btn cancel" @click="confirmDelete = false">Annuler</button>
+          <button class="btn delete" @click="deleteAccount">Supprimer</button>
+        </div>
       </div>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted } from "vue"
-import type { User } from "../types/types"
-import { fetchUserById, updateUser } from "../api/userApi"
-import { currentUser, token, logoutUser } from "../api/useAuth"
+import { onMounted, ref } from "vue";
+import { currentUser, logoutUser, token } from "../api/useAuth";
+import {
+	deleteUser,
+	fetchUserById,
+	updatePassword,
+	updateUser,
+} from "../api/userApi";
+import type { User } from "../types/types";
 
-const user = ref<User | null>(null)
-const loading = ref(true)
-const error = ref<string | null>(null)
-const editMode = ref(false)
-const updating = ref(false)
+const user = ref<User | null>(null);
+const loading = ref(true);
+const error = ref<string | null>(null);
+const editMode = ref(false);
+const passwordMode = ref(false);
+const updating = ref(false);
+const confirmDelete = ref(false);
 
 const form = ref({
-  first_name: "",
-  last_name: "",
-  email: "",
-})
+	first_name: "",
+	last_name: "",
+	email: "",
+});
+
+const passwordForm = ref({
+	oldPassword: "",
+	newPassword: "",
+});
 
 function toggleEditMode() {
-  editMode.value = !editMode.value
-  if (editMode.value && user.value) {
-    form.value.first_name = user.value.first_name
-    form.value.last_name = user.value.last_name
-    form.value.email = user.value.email
-  }
+	editMode.value = !editMode.value;
+	passwordMode.value = false;
+	if (editMode.value && user.value) {
+		form.value.first_name = user.value.first_name;
+		form.value.last_name = user.value.last_name;
+		form.value.email = user.value.email;
+	}
+}
+
+function togglePasswordMode() {
+	passwordMode.value = !passwordMode.value;
+	editMode.value = false;
 }
 
 async function loadUser() {
-  loading.value = true
-  error.value = null
-  try {
-    if (!currentUser.value?.id) throw new Error("Utilisateur non connecté")
-    if (!token) throw new Error("Accès non autorisé. Token manquant.")
+	loading.value = true;
+	try {
+		if (!currentUser.value?.id) throw new Error("Utilisateur non connecté");
+		if (!token) throw new Error("Accès non autorisé. Token manquant.");
 
-    const data = await fetchUserById(currentUser.value.id, token)
-    user.value = data
-  } catch (err: any) {
-    error.value = err.message || "Erreur lors du chargement du compte"
-  } finally {
-    loading.value = false
-  }
+		const data = await fetchUserById(currentUser.value.id, token);
+		user.value = data;
+	} catch (err: any) {
+		error.value = err.message || "Erreur lors du chargement du compte";
+	} finally {
+		loading.value = false;
+	}
 }
 
 async function handleUpdate() {
-  if (!user.value || !token.value) return
-  updating.value = true
-  try {
-    const tok = token.value
-    if (!tok) {
-      throw new Error("Accès non autorisé. Token manquant.")
-    }
-    const updated = await updateUser(user.value.id, form.value, tok)
-    user.value = updated
-    editMode.value = false
-  } catch (err: any) {
-    alert(err.message || "Erreur lors de la mise à jour du profil")
-  } finally {
-    updating.value = false
-  }
+	if (!user.value || !token.value) return;
+	updating.value = true;
+	try {
+		const updated = await updateUser(user.value.id, form.value, token.value);
+		user.value = updated;
+		editMode.value = false;
+	} catch (err: any) {
+		alert(err.message || "Erreur lors de la mise à jour du profil");
+	} finally {
+		updating.value = false;
+	}
+}
+
+async function handlePasswordChange() {
+	if (!token.value) return;
+	updating.value = true;
+	try {
+		await updatePassword(passwordForm.value, token.value);
+		alert("Mot de passe modifié avec succès !");
+		passwordMode.value = false;
+		passwordForm.value = { oldPassword: "", newPassword: "" };
+	} catch (err: any) {
+		alert(err.message || "Erreur lors du changement de mot de passe");
+	} finally {
+		updating.value = false;
+	}
+}
+
+async function deleteAccount() {
+	if (!user.value || !token.value) return;
+	try {
+		await deleteUser(user.value.id, token.value);
+		await logoutUser();
+		alert("Compte supprimé avec succès.");
+		window.location.href = "/login";
+	} catch (err: any) {
+		alert(err.message || "Erreur lors de la suppression du compte");
+	}
 }
 
 async function logout() {
-  await logoutUser()
-  window.location.href = "/login" 
+	await logoutUser();
+	window.location.href = "/login";
 }
 
-onMounted(loadUser)
+onMounted(loadUser);
 </script>
 
 <style scoped>
 .account-container {
-  max-width: 600px;
-  margin: 2rem auto;
-  background: #1c3632;
+  max-width: 700px;
+  margin: 3rem auto;
+  background: #132a27;
   color: #f5f5f5;
-  padding: 2rem;
+  padding: 2.5rem;
   border-radius: 12px;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+  box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+  transition: all 0.3s ease;
 }
 .account-title {
   text-align: center;
-  font-size: 1.8rem;
+  font-size: 1.9rem;
   color: #24d650;
-  margin-bottom: 1.5rem;
+  margin-bottom: 2rem;
 }
-.loading, .error {
-  text-align: center;
-  font-size: 1.1rem;
+.account-info {
+  border: 1px solid #2a5a4e;
+  border-radius: 10px;
+  padding: 1rem 1.5rem;
+  background: #1c3632;
 }
-.account-card {
-  display: flex;
-  flex-direction: column;
-  gap: 1rem;
-}
-.account-info .info-row {
+.info-row {
   display: flex;
   justify-content: space-between;
-  padding: 0.5rem 0;
+  padding: 0.6rem 0;
   border-bottom: 1px solid #2a5a4e;
 }
-.label {
-  font-weight: 600;
-  color: #a7e4b2;
+.info-row:last-child {
+  border-bottom: none;
 }
-.value {
-  font-weight: 400;
+.label {
+  color: #a7e4b2;
+  font-weight: 600;
 }
 .account-actions {
   display: flex;
-  justify-content: space-between;
-  margin-top: 1rem;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0.8rem;
+  margin-top: 1.5rem;
 }
 .btn {
-  background: #24d650;
-  color: white;
   border: none;
-  padding: 0.6rem 1.2rem;
   border-radius: 6px;
-  font-weight: 600;
+  padding: 0.6rem 1.2rem;
   cursor: pointer;
-  transition: background 0.2s;
+  font-weight: 600;
+  color: white;
+  transition: transform 0.15s, background 0.25s;
 }
 .btn:hover {
-  background: #1eb24a;
+  transform: scale(1.05);
+}
+.btn.edit {
+  background: #24d650;
+}
+.btn.password {
+  background: #0aa0d6;
 }
 .btn.logout {
   background: #d62424;
 }
-.btn.logout:hover {
-  background: #b41f1f;
+.btn.save-btn {
+  background: #24d650;
+  align-self: flex-end;
 }
+.btn.delete {
+  background: #b71c1c;
+}
+.danger-zone {
+  margin-top: 2rem;
+  background: #291717;
+  border: 1px solid #b71c1c;
+  padding: 1.2rem;
+  border-radius: 10px;
+  text-align: center;
+}
+.danger-zone h3 {
+  color: #ff5c5c;
+  margin-bottom: 0.5rem;
+}
+.password-form,
+.account-edit {
+  margin-top: 1.5rem;
+  background: #1c3632;
+  padding: 1rem 1.5rem;
+  border-radius: 8px;
+}
+.password-form form,
 .account-edit form {
   display: flex;
   flex-direction: column;
   gap: 1rem;
-  margin-top: 1rem;
 }
-.account-edit input {
+input {
   width: 100%;
   padding: 0.5rem;
   border-radius: 6px;
   border: none;
   background: #0e403e;
-  color: #fff;
+  color: white;
 }
-.save-btn {
-  align-self: flex-end;
+.modal-overlay {
+  position: fixed;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
+  background: rgba(0,0,0,0.6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.modal {
+  background: #1c3632;
+  padding: 2rem;
+  border-radius: 10px;
+  text-align: center;
+  color: #fff;
+  width: 90%;
+  max-width: 400px;
+}
+.modal-actions {
+  display: flex;
+  justify-content: center;
+  gap: 1rem;
+  margin-top: 1.5rem;
+}
+.btn.cancel {
+  background: #0aa0d6;
 }
 </style>

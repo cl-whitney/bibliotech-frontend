@@ -8,8 +8,8 @@
 </template>
 
 <script setup>
-import AppMain from '../components/AppMain.vue'
-import AppFooter from '../components/AppFooter.vue'
+import AppFooter from "../components/AppFooter.vue";
+import AppMain from "../components/AppMain.vue";
 </script>
 
 <style scoped>
