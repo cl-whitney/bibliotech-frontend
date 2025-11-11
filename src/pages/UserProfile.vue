@@ -21,11 +21,6 @@
           <span class="label">Email :</span>
           <span class="value">{{ user.email ?? '-' }}</span>
         </div>
-
-        <div class="info-row">
-          <span class="label">Rôle :</span>
-          <span class="value">{{ user.role ?? '-' }}</span>
-        </div>
       </div>
 
       <div class="account-actions">
@@ -82,13 +77,12 @@
       </div>
 
       <div class="danger-zone">
-        <h3>Zone dangereuse</h3>
+        <!-- <h3>Zone dangereuse</h3> -->
         <p>Supprimer votre compte est une action <strong>irréversible</strong>.</p>
         <button class="btn delete" @click="confirmDelete = true">🗑️ Supprimer mon compte</button>
       </div>
     </div>
 
-    <!-- Modale de confirmation -->
     <div v-if="confirmDelete" class="modal-overlay">
       <div class="modal">
         <h3>Confirmer la suppression</h3>
@@ -101,6 +95,7 @@
     </div>
   </div>
 </template>
+
 
 <script setup lang="ts">
 import { onMounted, ref } from "vue";
@@ -153,7 +148,8 @@ async function loadUser() {
 		if (!currentUser.value?.id) throw new Error("Utilisateur non connecté");
 		if (!token) throw new Error("Accès non autorisé. Token manquant.");
 
-		const data = await fetchUserById(currentUser.value.id, token);
+		// const data = await fetchUserById(currentUser.value.id, token);
+    const data = await fetchUserById(currentUser.value.id);
 		user.value = data;
 	} catch (err: any) {
 		error.value = err.message || "Erreur lors du chargement du compte";
@@ -341,5 +337,10 @@ input {
 }
 .btn.cancel {
   background: #0aa0d6;
+}
+.error {
+  color: #ff6b6b;
+  text-align: center;
+  margin-top: 1rem;
 }
 </style>

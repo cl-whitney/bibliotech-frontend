@@ -87,7 +87,6 @@ function selectFirst() {
 	if (first) select(first);
 }
 
-// 🔹 utilitaires pour surligner la recherche
 function escapeHtml(str = "") {
 	return String(str)
 		.replace(/&/g, "&amp;")

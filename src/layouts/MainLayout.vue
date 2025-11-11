@@ -24,19 +24,16 @@ import MenuSideBar from "../components/MenuSideBar.vue";
   overflow-x: hidden; 
 }
 
-/* Sidebar fixe sur grand écran */
 .sidebar {
   flex: 0 0 250px;
 }
 
-/* Main prend tout l'espace restant */
 .main {
   flex: 1;
   padding: 1rem;
   box-sizing: border-box;
 }
 
-/* Responsive pour petits écrans */
 @media (max-width: 900px) {
   .layout {
     flex-direction: column;

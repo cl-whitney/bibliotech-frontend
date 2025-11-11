@@ -83,6 +83,7 @@ onMounted(fetchSnippets);
   cursor: pointer;
   font-weight: 600;
   transition: background 0.2s;
+  margin-right: 1rem;
 }
 
 .create-btn:hover {
@@ -102,9 +103,6 @@ onMounted(fetchSnippets);
     list-style: none;
     padding: 0;
     margin-top: 0;
-    /* display: grid; */
-    /* grid-template-columns: repeat(3, 1fr); */
-    /* gap: 1rem; */
     flex-wrap: wrap;
 }
 

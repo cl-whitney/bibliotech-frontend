@@ -7,7 +7,6 @@
       </button>
     </div>
 
-    <!-- Popup de confirmation -->
     <div v-if="showConfirm" class="confirm-overlay">
       <div class="confirm-box">
         <p>Voulez-vous vraiment supprimer le tag "<strong>{{ tag.name }}</strong>" ?</p>
@@ -92,7 +91,6 @@ async function deleteTag() {
   color: #ff0000;
 }
 
-/* Popup de confirmation */
 .confirm-overlay {
   position: absolute;
   top: 0; left: 0;

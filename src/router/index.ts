@@ -1,15 +1,15 @@
 import { createRouter, createWebHistory } from "vue-router";
 import AuthLayout from "../layouts/AuthLayout.vue";
 import MainLayout from "../layouts/MainLayout.vue";
-// --- Auth ---
+
 import AuthForm from "../pages/AuthForm.vue";
 import FavoritesList from "../pages/FavoritesList.vue";
-// --- Page 404 ---
+
 import NotFound from "../pages/NotFound.vue";
 import SnippetDetail from "../pages/SnippetDetail.vue";
 import SnippetEdit from "../pages/SnippetEdit.vue";
 import SnippetForm from "../pages/SnippetForm.vue";
-// --- Pages principales ---
+
 import SnippetsList from "../pages/SnippetsList.vue";
 import TagsList from "../pages/TagsList.vue";
 import UserProfile from "../pages/UserProfile.vue";
@@ -36,7 +36,6 @@ const routes = [
 				component: SnippetEdit,
 			},
 
-			// ✅ Catch-all 404 pour les routes enfants du MainLayout
 			{ path: ":pathMatch(.*)*", name: "NotFound", component: NotFound },
 		],
 	},
@@ -50,7 +49,6 @@ const routes = [
 		],
 	},
 
-	// ✅ Et un autre catch-all global pour tout le reste
 	{ path: "/:pathMatch(.*)*", name: "GlobalNotFound", component: NotFound },
 ];
 

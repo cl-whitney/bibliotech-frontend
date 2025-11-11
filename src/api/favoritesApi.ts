@@ -1,4 +1,3 @@
-// favoritesApi.ts
 import axios from "./axios";
 
 export async function addFavorite(snippetId: number, token: string) {

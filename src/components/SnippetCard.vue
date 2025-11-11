@@ -1,6 +1,5 @@
 <template>
   <li class="snippet-card">
-    <!-- Etoile Favoris -->
     <button class="favorite-btn" @click.stop="toggleFavorite">
       <span v-if="isFavorite">★</span>
       <span v-else>☆</span>
@@ -18,12 +17,11 @@
     </div>
 
     <div class="snippet-description">
-      <span class="meta-label">Description: </span>
+      <!-- <span class="meta-label">Description : </span> -->
       <span class="meta-value">{{ props.snippet.description ?? '-' }}</span>
     </div>
 
     <div class="snippet-code">
-      <!-- Bouton copier style ChatGPT -->
       <button class="copy-btn" @click="copyCode">
         <svg v-if="!copied" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="18" height="18" fill="currentColor">
           <path d="M16 1H4C2.895 1 2 1.895 2 3v14h2V3h12V1zm3 4H8c-1.105 0-2 .895-2 2v16c0 1.105.895 2 2 2h11c1.105 0 2-.895 2-2V7c0-1.105-.895-2-2-2zm0 18H8V7h11v16z"/>
@@ -114,7 +112,7 @@ onMounted(() => {
 
 <style scoped>
 .snippet-card {
-  width: 100%;
+  width: 96.5%;
   display: flex;
   flex-direction: column;
   background: #1c3632;
@@ -130,7 +128,7 @@ onMounted(() => {
 .favorite-btn {
   position: absolute;
   top: 10px;
-  right: 10px;
+  right: 1.8rem;
   background: transparent;
   border: none;
   color: #ffce00;
@@ -178,7 +176,7 @@ onMounted(() => {
 
 .snippet-code {
   position: relative;
-  background: #0e403e;
+  background: #2d2d2d;
   padding: 1rem;
   border-radius: 8px;
   font-family: 'Fira Code', monospace;
@@ -188,7 +186,6 @@ onMounted(() => {
   margin-bottom: 0.5rem;
 }
 
-/* Bouton copier style ChatGPT */
 .copy-btn {
   position: absolute;
   top: 8px;
@@ -206,7 +203,6 @@ onMounted(() => {
   transform: scale(1.1);
 }
 
-/* Toggle bouton */
 .toggle-btn {
   background: transparent;
   color: #24d650;

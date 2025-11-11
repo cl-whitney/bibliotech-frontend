@@ -40,7 +40,7 @@ function goTo(route: string) {
 <style scoped>
 .menu-sidebar {
   width: 220px;
-  background: #1c3632; /* couleur sombre cohérente avec le reste de l'app */
+  background: #1c3632; 
   color: #f5f5f5;
   min-height: 100vh;
   padding: 1.5rem 1rem;
@@ -85,7 +85,6 @@ function goTo(route: string) {
   font-size: 1rem;
 }
 
-/* Responsive : sidebar compacte sur petits écrans */
 @media (max-width: 768px) {
   .menu-sidebar {
     width: 60px;

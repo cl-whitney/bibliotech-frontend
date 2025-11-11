@@ -29,6 +29,10 @@ function goHome() {
   color: #fff;
   padding: 0.8rem 2rem;
   box-shadow: 0 2px 8px #0002;
+
+  position: sticky;
+  top: 0;
+  z-index: 1000;
 }
 
 .logo {

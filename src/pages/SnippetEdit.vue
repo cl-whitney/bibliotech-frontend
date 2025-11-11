@@ -1,14 +1,13 @@
 <template>
   <section class="snippet-form-container">
-    <!-- Tags sélectionnés au-dessus du titre -->
+    <h2 class="page-title">Modifier le snippet</h2>
+
     <div v-if="selectedTagIds.length" class="selected-tags">
       <span v-for="id in selectedTagIds" :key="id" class="tag">
         {{ getTagNameById(id) }}
         <button type="button" class="remove-tag" @click="removeTag(id)">×</button>
       </span>
     </div>
-
-    <h2 class="page-title">Modifier le snippet</h2>
 
     <div v-if="loading" class="loading">Chargement...</div>
     <div v-else-if="error" class="error">{{ error }}</div>
@@ -42,6 +41,8 @@
           placeholder="Votre code..."
           required
           class="code-textarea"
+          @input="adjustHeight"
+          ref="codeTextarea"
         ></textarea>
       </div>
 
@@ -55,7 +56,6 @@
         </select>
       </div>
 
-      <!-- Bloc Tags sous forme de boutons cliquables -->
       <div class="form-group">
         <label>Tags</label>
         <div class="tags-buttons">
@@ -85,7 +85,7 @@
 </template>
 
 <script setup lang="ts">
-import { onMounted, ref } from "vue";
+import { onMounted, ref, nextTick } from "vue";
 import { useRoute, useRouter } from "vue-router";
 import axios from "../api/axios";
 import { fetchSnippetById, updateSnippet } from "../api/snippetsApi";
@@ -96,10 +96,10 @@ const route = useRoute();
 const snippetId = Number(route.params.id);
 
 const form = ref({
-	title: "",
-	description: "",
-	code: "",
-	language_id: null as number | null,
+  title: "",
+  description: "",
+  code: "",
+  language_id: null as number | null,
 });
 
 const languages = ref<Language[]>([]);
@@ -110,121 +110,122 @@ const saving = ref(false);
 const error = ref<string | null>(null);
 const success = ref(false);
 
-// Supprimer un tag depuis la zone des tags sélectionnés
+const codeTextarea = ref<HTMLTextAreaElement | null>(null);
+
 function removeTag(id: number) {
-	selectedTagIds.value = selectedTagIds.value.filter((tid) => tid !== id);
+  selectedTagIds.value = selectedTagIds.value.filter((tid) => tid !== id);
 }
 
-// Ajouter/enlever un tag en cliquant
 function toggleTag(id: number) {
-	if (selectedTagIds.value.includes(id)) {
-		removeTag(id);
-	} else {
-		selectedTagIds.value.push(id);
-	}
+  if (selectedTagIds.value.includes(id)) {
+    removeTag(id);
+  } else {
+    selectedTagIds.value.push(id);
+  }
 }
 
-// Récupérer le nom d'un tag
 function getTagNameById(id: number) {
-	const tag = tags.value.find((t) => t.id === id);
-	return tag ? tag.name : "";
+  const tag = tags.value.find((t) => t.id === id);
+  return tag ? tag.name : "";
 }
 
-// Charger le snippet
+function adjustHeight() {
+  nextTick(() => {
+    if (codeTextarea.value) {
+      codeTextarea.value.style.height = "auto";
+      codeTextarea.value.style.height = `${codeTextarea.value.scrollHeight}px`;
+    }
+  });
+}
+
 async function fetchSnippet() {
-	try {
-		const token = localStorage.getItem("token");
-		if (!token) throw new Error("Utilisateur non authentifié");
+  try {
+    const token = localStorage.getItem("token");
+    if (!token) throw new Error("Utilisateur non authentifié");
 
-		const data = await fetchSnippetById(snippetId, token);
-		form.value.title = data.title;
-		form.value.description = data.description || "";
-		form.value.code = data.code;
-		form.value.language_id = data.language?.id || null;
-		selectedTagIds.value = data.tags?.map((t) => t.id) || [];
-	} catch (err: any) {
-		error.value = err.message || "Erreur lors du chargement du snippet";
-	} finally {
-		loading.value = false;
-	}
+    const data = await fetchSnippetById(snippetId, token);
+    form.value.title = data.title;
+    form.value.description = data.description || "";
+    form.value.code = data.code;
+    form.value.language_id = data.language?.id || null;
+    selectedTagIds.value = data.tags?.map((t) => t.id) || [];
+
+    adjustHeight();
+  } catch (err: any) {
+    error.value = err.message || "Erreur lors du chargement du snippet";
+  } finally {
+    loading.value = false;
+  }
 }
 
-// Charger les langages et tags
 async function fetchLanguages() {
-	try {
-		const res = await axios.get<Language[]>("/api/languages");
-		languages.value = res.data;
-	} catch (err: any) {
-		console.error(err);
-	}
+  try {
+    const res = await axios.get<Language[]>("/api/languages");
+    languages.value = res.data;
+  } catch (err: any) {
+    console.error(err);
+  }
 }
 
 async function fetchTags() {
-	try {
-		const res = await axios.get<Tag[]>("/api/tags");
-		tags.value = res.data.filter((t) => t.status);
-	} catch (err: any) {
-		console.error(err);
-	}
+  try {
+    const res = await axios.get<Tag[]>("/api/tags");
+    tags.value = res.data.filter((t) => t.status);
+  } catch (err: any) {
+    console.error(err);
+  }
 }
 
-// Soumission du formulaire
 async function submitForm() {
-	error.value = null;
-	success.value = false;
+  error.value = null;
+  success.value = false;
 
-	const token = localStorage.getItem("token");
-	if (!token) {
-		error.value = "Utilisateur non authentifié";
-		return;
-	}
+  const token = localStorage.getItem("token");
+  if (!token) {
+    error.value = "Utilisateur non authentifié";
+    return;
+  }
 
-	if (!form.value.language_id) {
-		error.value = "Veuillez sélectionner un langage";
-		return;
-	}
+  if (!form.value.language_id) {
+    error.value = "Veuillez sélectionner un langage";
+    return;
+  }
 
-	saving.value = true;
+  saving.value = true;
 
-	try {
-		await updateSnippet(
-			snippetId,
-			{
-				title: form.value.title,
-				description: form.value.description,
-				code: form.value.code,
-				language_id: form.value.language_id,
-				tagIds: selectedTagIds.value,
-			},
-			token,
-		);
-		success.value = true;
-		setTimeout(
-			() => router.push({ name: "SnippetDetail", params: { id: snippetId } }),
-			1000,
-		);
-	} catch (err: any) {
-		error.value = err.message || "Erreur lors de la mise à jour";
-	} finally {
-		saving.value = false;
-	}
+  try {
+    await updateSnippet(
+      snippetId,
+      {
+        title: form.value.title,
+        description: form.value.description,
+        code: form.value.code,
+        language_id: form.value.language_id,
+        tagIds: selectedTagIds.value,
+      },
+      token,
+    );
+    success.value = true;
+    setTimeout(() => router.push({ name: "SnippetDetail", params: { id: snippetId } }), 1000);
+  } catch (err: any) {
+    error.value = err.message || "Erreur lors de la mise à jour";
+  } finally {
+    saving.value = false;
+  }
 }
 
-// Annuler
 function cancelEdit() {
-	router.back();
+  router.back();
 }
 
-// Initialisation
 onMounted(() => {
-	fetchSnippet();
-	fetchLanguages();
-	fetchTags();
+  fetchSnippet();
+  fetchLanguages();
+  fetchTags();
 });
 </script>
 
 <style scoped>
-/* Styles existants conservés */
 .snippet-form-container {
   max-width: 800px;
   margin: 40px auto;
@@ -236,7 +237,7 @@ onMounted(() => {
 }
 
 .page-title {
-  font-size: 1.6rem;
+  font-size: 1.8rem;
   font-weight: 700;
   color: #24d650;
   margin-bottom: 1.5rem;
@@ -256,7 +257,7 @@ onMounted(() => {
 .snippet-form input,
 .snippet-form select,
 .snippet-form textarea {
-  width: 100%;
+  width: 96.5%;
   padding: 0.6rem 0.8rem;
   border-radius: 6px;
   border: none;
@@ -268,8 +269,10 @@ onMounted(() => {
 
 .snippet-form textarea.code-textarea {
   font-family: 'Fira Code', monospace;
+  background-color: #2d2d2d;
   min-height: 120px;
   resize: vertical;
+  overflow-y: hidden;
 }
 
 .tags-buttons {
@@ -347,7 +350,6 @@ button[disabled] {
   font-weight: 500;
 }
 
-/* Styles des tags sélectionnés au-dessus du titre */
 .selected-tags {
   display: flex;
   flex-wrap: wrap;

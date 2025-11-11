@@ -2,7 +2,6 @@
   <section class="tags-section">
     <h2 class="page-title">Tous les tags</h2>
 
-    <!-- Formulaire création -->
     <form class="create-tag-form" @submit.prevent="createTag">
       <input
         v-model="newTagName"
@@ -16,7 +15,6 @@
       </button>
     </form>
 
-    <!-- Barre de recherche -->
     <input
       v-model="searchQuery"
       type="text"
@@ -24,11 +22,9 @@
       class="search-input"
     />
 
-    <!-- États -->
     <div v-if="loading" class="status-text">Chargement...</div>
     <div v-else-if="error" class="status-text error">{{ error }}</div>
 
-    <!-- Liste filtrée ou message aucun tag -->
     <ul class="tag-list" v-if="filteredTags.length">
       <TagCard
         v-for="tag in filteredTags"
@@ -51,7 +47,6 @@ import {
 import TagCard from "../components/TagCard.vue";
 import type { Tag } from "../types/types";
 
-// États
 const tags = ref<Tag[]>([]);
 const loading = ref(true);
 const error = ref<string | null>(null);
@@ -60,7 +55,6 @@ const newTagName = ref("");
 const creating = ref(false);
 const searchQuery = ref("");
 
-// 🔹 Récupération des tags
 async function fetchTags() {
 	loading.value = true;
 	error.value = null;
@@ -78,7 +72,6 @@ async function fetchTags() {
 	}
 }
 
-// 🔹 Création d’un tag
 async function createTag() {
 	if (!newTagName.value.trim()) return;
 	creating.value = true;
@@ -102,7 +95,6 @@ async function createTag() {
 	}
 }
 
-// 🔹 Suppression d’un tag
 async function removeTag(id: number) {
 	try {
 		const token = localStorage.getItem("token");
@@ -115,7 +107,6 @@ async function removeTag(id: number) {
 	}
 }
 
-// 🔹 Tags filtrés par recherche
 const filteredTags = computed(() =>
 	tags.value.filter((tag) =>
 		tag.name.toLowerCase().includes(searchQuery.value.toLowerCase()),

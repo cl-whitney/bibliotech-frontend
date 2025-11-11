@@ -16,5 +16,11 @@
   font-size: 0.95rem;
   margin-top: auto;
   box-shadow: 0 -2px 8px #0002;
+
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  z-index: 1000; 
 }
 </style>

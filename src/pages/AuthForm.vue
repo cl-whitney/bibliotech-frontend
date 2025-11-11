@@ -193,10 +193,9 @@ button[type="submit"] {
   padding: 0.5rem;
   margin-bottom: 1rem;
   border-radius: 4px;
-  /* border: 1px solid #ccc; */
   border: none;
   outline: none;
-  box-sizing: border-box; /* ⚡ garantit même largeur */
+  box-sizing: border-box; 
 }
 
 button[type="submit"] {

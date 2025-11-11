@@ -2,7 +2,6 @@
   <section class="snippet-form-container">
     <h2 class="page-title">Nouveau snippet</h2>
 
-    <!-- Tags sélectionnés affichés sous le titre -->
     <div v-if="selectedTags.length" class="selected-tags">
       <span v-for="id in selectedTags" :key="id" class="tag">
         {{ getTagNameById(id) }}
@@ -33,7 +32,6 @@
         </select>
       </div>
 
-      <!-- Tags cliquables -->
       <div class="form-group">
         <label>Tags</label>
         <div class="tags-checkboxes">
@@ -84,7 +82,6 @@ const creating = ref(false);
 const error = ref<string | null>(null);
 const success = ref(false);
 
-// Fetch languages & tags
 onMounted(() => {
 	fetchLanguages();
 	fetchTags();
@@ -108,7 +105,6 @@ async function fetchTags() {
 	}
 }
 
-// Toggle tag selection
 function toggleTag(tag: Tag) {
 	const id = tag.id;
 	if (selectedTags.value.includes(id)) {
@@ -118,13 +114,11 @@ function toggleTag(tag: Tag) {
 	}
 }
 
-// Get tag name from ID
 function getTagNameById(id: number) {
 	const tag = tags.value.find((t) => t.id === id);
 	return tag ? tag.name : "";
 }
 
-// Submit form
 async function submitForm() {
 	error.value = null;
 	success.value = false;
@@ -157,14 +151,13 @@ async function submitForm() {
 		code: code.value,
 		language_id: languageId.value,
 		description: description.value.trim() || undefined,
-		tagIds: selectedTags.value, // ✅ tableau de nombres
+		tagIds: selectedTags.value, 
 	};
 
 	try {
 		await createSnippet(payload, token);
 		success.value = true;
 
-		// Reset form
 		title.value = "";
 		description.value = "";
 		code.value = "";
@@ -196,10 +189,9 @@ function cancelCreation() {
 }
 
 .page-title {
-  font-size: 1.6rem;
+  font-size: 1.8rem;
   font-weight: 700;
   color: #24d650;
-  margin-bottom: 1rem;
 }
 
 .selected-tags {

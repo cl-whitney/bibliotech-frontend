@@ -21,11 +21,10 @@
       </div>
 
       <div class="snippet-description">
-        <span class="meta-label">Description: </span>
+        <!-- <span class="meta-label">Description : </span> -->
         <span class="meta-value">{{ snippet.description ?? '-' }}</span>
       </div>
 
-      <!-- Bloc code avec Prism -->
       <div class="snippet-code">
         <pre :class="`language-${snippet.language?.slug || 'javascript'}`">
           <code ref="codeEl" v-html="highlightedCode"></code>
@@ -44,7 +43,6 @@
 
       <button @click="goBack">Retour</button>
 
-      <!-- Popup de confirmation -->
       <div v-if="showConfirm" class="confirm-overlay">
         <div class="confirm-box">
           <p>Voulez-vous vraiment supprimer le snippet "<strong>{{ snippet.title }}</strong>" ?</p>
@@ -68,7 +66,6 @@ import {
 } from "../api/snippetsApi";
 import type { Snippet } from "../types/types";
 
-// Prism.js
 import Prism from "../utils/prism-languages";
 
 const route = useRoute();
@@ -217,7 +214,6 @@ onMounted(fetchSnippet);
 .meta-value { color: #f5f5f5; }
 
 .snippet-code {
-  /* background: #0e403e; */
   display: flex;
   background: #2d2d2d;
   padding: 1rem;
@@ -250,7 +246,6 @@ button {
   font-weight: 600;
 }
 
-/* Popup de confirmation */
 .confirm-overlay {
   position: absolute;
   top: 0; left: 0;

@@ -38,13 +38,11 @@ const favorites = ref<number[]>([]);
 const loading = ref(true);
 const error = ref<string | null>(null);
 
-// Récupère les favoris depuis localStorage
 function loadFavorites() {
 	const fav = localStorage.getItem("favorites");
 	favorites.value = fav ? JSON.parse(fav) : [];
 }
 
-// Filtre les snippets selon favoris + recherche
 const filteredFavorites = computed(() => {
 	return allSnippets.value
 		.filter((s) => favorites.value.includes(s.id))
@@ -95,7 +93,6 @@ onMounted(() => {
   flex-direction: column;
   justify-content: space-between;
   flex-wrap: wrap;
-  /* gap: 1rem; */
 }
 
 .page-title {
@@ -133,8 +130,6 @@ onMounted(() => {
   list-style: none;
   padding: 0;
   margin-top: 0;
-  /* display: grid;
-  grid-template-columns: repeat(3, 1fr); */
   gap: 1rem;
 }
 
