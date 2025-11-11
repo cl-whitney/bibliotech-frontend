@@ -14,45 +14,61 @@ import SnippetsList from "../pages/SnippetsList.vue";
 import TagsList from "../pages/TagsList.vue";
 import UserProfile from "../pages/UserProfile.vue";
 
+function isLoggedIn(): boolean {
+  return false; 
+}
+
 const routes = [
-	{
-		path: "/",
-		component: MainLayout,
-		children: [
-			{ path: "", name: "Home", component: SnippetsList },
-			{ path: "snippets", name: "SnippetsList", component: SnippetsList },
-			{ path: "tags", name: "TagsList", component: TagsList },
-			{ path: "account", name: "UserProfile", component: UserProfile },
-			{ path: "favorites", name: "FavoritesList", component: FavoritesList },
-			{ path: "snippets/new", name: "SnippetForm", component: SnippetForm },
-			{
-				path: "snippets/:id(\\d+)",
-				name: "SnippetDetail",
-				component: SnippetDetail,
-			},
-			{
-				path: "snippets/:id(\\d+)/edit",
-				name: "SnippetEdit",
-				component: SnippetEdit,
-			},
+  {
+    path: "/",
+    redirect: () => {
+      return isLoggedIn() ? "/snippets" : "/auth";
+    },
+  },
 
-			{ path: ":pathMatch(.*)*", name: "NotFound", component: NotFound },
-		],
-	},
-	{
-		path: "/auth",
-		component: AuthLayout,
-		children: [
-			{ path: "", name: "Auth", component: AuthForm },
-			{ path: "login", name: "Login", component: AuthForm },
-			{ path: "signup", name: "Signup", component: AuthForm },
-		],
-	},
+  {
+    path: "/auth",
+    component: AuthLayout,
+    children: [
+      { path: "", name: "Auth", component: AuthForm },
+      { path: "login", name: "Login", component: AuthForm },
+      { path: "signup", name: "Signup", component: AuthForm },
+    ],
+  },
 
-	{ path: "/:pathMatch(.*)*", name: "GlobalNotFound", component: NotFound },
+  {
+    path: "/snippets",
+    component: MainLayout,
+    children: [
+      { path: "", name: "Home", component: SnippetsList }, // ⚡ Home disponible pour router.push
+      { path: "snippets", name: "SnippetsList", component: SnippetsList },
+      { path: "new", name: "SnippetForm", component: SnippetForm },
+      { path: ":id(\\d+)", name: "SnippetDetail", component: SnippetDetail },
+      { path: ":id(\\d+)/edit", name: "SnippetEdit", component: SnippetEdit },
+      { path: ":pathMatch(.*)*", name: "NotFound", component: NotFound },
+    ],
+  },
+
+  {
+    path: "/tags",
+    component: MainLayout,
+    children: [{ path: "", name: "TagsList", component: TagsList }],
+  },
+  {
+    path: "/account",
+    component: MainLayout,
+    children: [{ path: "", name: "UserProfile", component: UserProfile }],
+  },
+  {
+    path: "/favorites",
+    component: MainLayout,
+    children: [{ path: "", name: "FavoritesList", component: FavoritesList }],
+  },
+
+  { path: "/:pathMatch(.*)*", name: "GlobalNotFound", component: NotFound },
 ];
 
 export const router = createRouter({
-	history: createWebHistory(),
-	routes,
+  history: createWebHistory(),
+  routes,
 });
